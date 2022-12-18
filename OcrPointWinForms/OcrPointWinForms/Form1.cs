@@ -36,6 +36,7 @@ namespace OcrPointWinForms
             }
         }
 
+        // LoadJson - Sample json must be in exe folder and file name called 'ocr.json'
         private void LoadJson()
         {
             using (StreamReader r = new StreamReader("./ocr.json"))
