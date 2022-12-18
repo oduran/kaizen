@@ -1,0 +1,79 @@
+Birden fazla dilde hizmet vermek üzere bir haber ajans sistemi tasarlanacaktır. Sistem multi-
+language destekli olarak tasarlanacak ve kullanıcının kullandığı dile uygun olarak içerikler istenen
+
+dilde servis edilecektir. Bu sistemde bir içerik için temelde aşağıdaki bilgilerin tutulması
+gerekmektedir.
+- Name (Identifier olarak kullanılır, Multi Language olmasına gerek yok. Ingilizce yazılır)
+- Title (Multi Language)
+- Detail (Multi Language)
+- ImageUrls (Multi Language, Bir içerik birden fazla imaja sahip olabilir)
+- Category (Multi Language)
+Kullanıcılar okumak istedikleri içerikler için web sitesi üzerinden desteklenen diller arasında bir
+seçim yapabilir, ardından da sisteme bu dil seçeneği ile birlikte istek atarak ilgili dil için girilmiş
+içerikleri listeleyebilirler.
+Sisteme dil seçeneği ile istek geldiği durumda tasarladığınız yapıya uygun olarak içeriklerin
+verilmesini sağlayacak T-SQL sorgusunu yazmanız beklenmektedir.
+Yapılacak tasarımın farklı ihtiyaçlara da kolayca cevap verebilecek esneklikte olması
+beklenmektedir. Örneğin web sitesi üzerindeki tasarıma ait butonlar ya da uyarılar gibi textler de
+dil değişiminde aynı sisteme kolayca uyarlanabilmelidir. Örneğin; Türkçe seçildiğinde üzerinde
+“Giriş Yap” yazan bir buton İngilizce seçildiğinde “Login” olarak değişebilmelidir.
+
+CREATE TABLE Contents (
+    Id INTEGER PRIMARY KEY,
+    Name varchar(255) NOT NULL,
+    Title varchar(255) NOT NULL,
+    Detail text NOT NULL,
+    ImageUrls text NOT NULL,
+    Category varchar(255) NOT NULL,
+    LanguageId INTEGER NOT NULL,
+    FOREIGN KEY (LanguageId) REFERENCES Languages(Id)
+);
+INSERT INTO Contents (Id, Name,Title,Detail,ImageUrls,Category,LanguageId) VALUES (1, 'News1','en-News1-Title','','en-News1-ImgUrl1, en-News1-ImgUrl2, en-News1-ImgUrln','Economy',1);
+INSERT INTO Contents (Id, Name,Title,Detail,ImageUrls,Category,LanguageId) VALUES (2, 'News1','tr-News1-Title','','tr-News1-ImgUrl1, tr-News1-ImgUrl2, tr-News1-ImgUrln','Ekonomi',2);
+
+
+CREATE TABLE Buttons (
+    Id INTEGER PRIMARY KEY,
+    Name VARCHAR(255),
+    Class VARCHAR(255),
+    Icon VARCHAR(255),
+    Background VARCHAR(255),
+    LanguageId INTEGER,
+    FOREIGN KEY (LanguageId) REFERENCES Languages(Id)
+);
+INSERT INTO Buttons (Id, Name,Class,Icon,Background,LanguageId) VALUES (1, 'Login','btn btn-info','bi-circle','',1);
+INSERT INTO Buttons (Id, Name,Class,Icon,Background,LanguageId) VALUES (2, 'Giriş Yap','btn btn-info','bi-circle','',2);
+
+
+
+CREATE TABLE Messages (
+    Id INTEGER PRIMARY KEY,
+    Message TEXT,
+    MessageTypeId INTEGER,
+    LanguageId INTEGER,
+    FOREIGN KEY (LanguageId) REFERENCES Languages(Id)
+);
+CREATE TABLE MessageTypes (
+    Id INTEGER PRIMARY KEY,
+    Type VARCHAR(255)
+);
+
+INSERT INTO MessageTypes (Id, Type) VALUES (1, 'Error');
+INSERT INTO MessageTypes (Id, Type) VALUES (2, 'Info');
+INSERT INTO MessageTypes (Id, Type) VALUES (3, 'Success');
+
+CREATE TABLE Languages (
+    Id INTEGER PRIMARY KEY,
+    LanguageName VARCHAR(255)
+);
+
+INSERT INTO Languages (Id, LanguageName) VALUES (1, 'en');
+INSERT INTO Languages (Id, LanguageName) VALUES (2, 'tr');
+
+
+// Get contents by language (for parameter = 'tr' )
+select * from Contents c
+INNER JOIN Languages l ON l.Id == c.LanguagesId
+where l.LanguageName = 'tr'
+
+
